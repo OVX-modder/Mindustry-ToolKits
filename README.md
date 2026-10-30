@@ -41,7 +41,7 @@ The heart of the app. Connect with other engineers.
 ## 📱 How to Install
 
 ### Option 1: Android APK (Recommended)
-1. Go to the **[Releases](https://github.com/YOUR_USERNAME/mindustry-toolkits/releases)** page on this repository.
+1. Go to the **[Releases](https://github.com/OVX-modder/mindustry-toolkits/releases)** page on this repository.
 2. Download the latest `.apk` file.
 3. Open the file on your Android device (you may need to allow "Install from unknown sources").
 4. Launch and enjoy!
