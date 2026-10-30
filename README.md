@@ -61,11 +61,3 @@ This project was built from scratch to be lightweight, fast, and easy to maintai
 * **Hosting:** [Netlify](https://www.netlify.com/) for blazing-fast global content delivery.
 * **App Packaging:** [PWABuilder](https://www.pwabuilder.com/) to convert the PWA into an Android App Bundle (AAB) and APK.
 * **Styling:** Custom CSS utilizing CSS Variables for seamless Dark/Light mode switching.
-
-## 🧑‍💻 Local Development
-
-If you want to run this project locally or contribute:
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/mindustry-toolkits.git
