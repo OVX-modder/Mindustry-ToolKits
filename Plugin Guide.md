@@ -36,7 +36,7 @@ To protect the app and its users, all plugins are manually reviewed before being
 3. **Submit for Review:** 
    *   Open a Pull Request on this GitHub repository.
    *   OR contact the app developer (Ovx) on Discord with the link to your raw file.
-4. **Approval:** The developer will review your code for security and performance. If approved, it will be merged, and it will automatically appear in the app's Settings menu for everyone.
+4. **Approval:** The developer will review your code for security and performance. If approved, it will be merged, and it will automatically appear in the app's Plugin Store for everyone.
 
 ---
 
@@ -50,12 +50,13 @@ export const pluginInfo = {
   id: "my-plugin",             // Must be unique, lowercase, no spaces
   name: "My Cool Tool",        // The name shown in the Home menu
   description: "A short description of what this does.",
-  author: "YourName"
+  author: "YourName",
+  category: "utility"          // Filter category: "utility", "game", "logic", or "other"
 };
 
 // 2. The UI (Required)
 // The app will pass a DOM element (container) to this function.
-export function mount(container) {
+export function mount(container, appData) {
   // Build your UI inside the container
   container.innerHTML = `
     <div class="card" style="text-align: center;">
