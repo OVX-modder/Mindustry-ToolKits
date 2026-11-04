@@ -4,17 +4,15 @@ async function mountEnabledPlugins() {
 
   for (const pluginData of enabledPlugins) {
     try {
-      // --- THE FIX: Bypass GitHub's security restriction ---
+      // THE FIX: Fetch the text and create a virtual file
       const response = await fetch(pluginData.url);
       const codeText = await response.text();
       
-      // Create a virtual file in the browser memory
       const blob = new Blob([codeText], { type: 'application/javascript' });
       const blobUrl = URL.createObjectURL(blob);
       
       // Import the virtual file instead of the raw URL
       const module = await import(blobUrl);
-      // ----------------------------------------------------
       
       if (!module.pluginInfo || !module.mount) continue;
 
