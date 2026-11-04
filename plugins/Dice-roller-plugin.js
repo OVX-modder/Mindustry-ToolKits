@@ -1,20 +1,62 @@
-export const pluginInfo = {
-  id: "dice-roller",
-  name: "Dice Roller",
-  description: "Roll a D6 for challenge runs.",
-  author: "Ovx"
-};
+// --- 3. MOUNT ENABLED PLUGINS ON STARTUP ---
+async function mountEnabledPlugins() {
+  if (enabledPlugins.length === 0) return;
 
-export function mount(container) {
-  container.innerHTML = `
-    <div class="card" style="text-align: center; margin-top: 24px;">
-      <h2 style="font-size: 48px; margin: 20px 0; color: var(--accent-blue);" id="dice-result">🎲 0</h2>
-      <button class="btn btn-primary" id="roll-btn" style="width: 100%; font-size: 18px; padding: 12px;">Roll Dice</button>
-    </div>
-  `;
-  
-  container.querySelector('#roll-btn').addEventListener('click', () => {
-    const roll = Math.floor(Math.random() * 6) + 1;
-    container.querySelector('#dice-result').textContent = `🎲 ${roll}`;
-  });
+  for (const pluginData of enabledPlugins) {
+    try {
+      // --- THE FIX: Bypass GitHub's security restriction ---
+      const response = await fetch(pluginData.url);
+      const codeText = await response.text();
+      
+      // Create a virtual file in the browser memory
+      const blob = new Blob([codeText], { type: 'application/javascript' });
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // Import the virtual file instead of the raw URL
+      const module = await import(blobUrl);
+      // ----------------------------------------------------
+      
+      if (!module.pluginInfo || !module.mount) continue;
+
+      const info = module.pluginInfo;
+      const panelId = `plugin-${info.id}`;
+
+      // Create the Panel
+      const newPanel = document.createElement('section');
+      newPanel.className = 'panel';
+      newPanel.dataset.panel = panelId;
+      newPanel.innerHTML = `
+        <button class="back-btn" data-target="home">← Back to Home</button>
+        <div id="plugin-content-${info.id}"></div>
+      `;
+      outlet.appendChild(newPanel);
+
+      // Create the Home Menu Button
+      const menuBtn = document.createElement('button');
+      menuBtn.className = 'tool-row';
+      menuBtn.dataset.target = panelId;
+      menuBtn.innerHTML = `
+        <div class="tool-left">
+          <div class="tool-icon info" style="border-radius: 50%;"></div>
+          <span>${info.name}</span>
+        </div>
+        <span class="chevron">›</span>
+      `;
+      
+      menuBtn.addEventListener('click', () => {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('is-active'));
+        newPanel.classList.add('is-active');
+        window.scrollTo(0, 0);
+      });
+      
+      toolList.appendChild(menuBtn);
+
+      // Mount the UI
+      const container = newPanel.querySelector(`#plugin-content-${info.id}`);
+      module.mount(container);
+
+    } catch (error) {
+      console.error(`Failed to load plugin: ${pluginData.url}`, error);
+    }
+  }
 }
