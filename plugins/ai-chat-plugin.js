@@ -7,24 +7,20 @@ export const pluginInfo = {
 };
 
 export function mount(container) {
+  // 🚨 REPLACE THIS STRING WITH YOUR CLOUDFLARE WORKER URL!
   const BACKEND_URL = "https://mindustry-ai.bobosawnthet.workers.dev/";
 
   container.innerHTML = `
     <div class="card" style="display: flex; flex-direction: column; height: 400px; padding: 0; overflow: hidden;">
-      
-      <!-- Chat History -->
       <div id="chat-history" style="flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
         <div style="background: var(--bg-overlay); padding: 12px; border-radius: var(--radius-sm); font-size: 13px; color: var(--fg-muted);">
           Hello! I am your Mindustry AI assistant. Ask me anything about factory ratios, logic, or unit stats!
         </div>
       </div>
-
-      <!-- Input Area -->
       <div style="display: flex; gap: 8px; padding: 12px; border-top: 1px solid var(--border-default); background: var(--bg-subtle);">
         <input id="chat-input" class="input" type="text" placeholder="Type a message..." style="flex: 1; min-height: 36px;">
         <button id="send-btn" class="btn btn-primary" style="padding: 0 16px;">Send</button>
       </div>
-
     </div>
   `;
 
@@ -45,20 +41,19 @@ export function mount(container) {
       msg.style.background = 'var(--accent-blue)';
       msg.style.color = '#fff';
       msg.style.borderBottomRightRadius = '2px';
-      msg.textContent = text; // User text stays plain
+      msg.textContent = text;
     } else {
       msg.style.alignSelf = 'flex-start';
       msg.style.background = 'var(--bg-overlay)';
       msg.style.color = 'var(--fg-default)';
       msg.style.borderBottomLeftRadius = '2px';
       
-      // 🪄 Convert Markdown to HTML for the AI's response
       let formattedText = text
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") // Security first
-        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold
-        .replace(/\*(.*?)\*/g, "<em>$1</em>") // Italics
-        .replace(/`([^`]+)`/g, "<code style='background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:4px;font-family:var(--font-mono);font-size:12px;'>$1</code>") // Inline code
-        .replace(/\n/g, "<br>"); // Line breaks
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\*(.*?)\*/g, "<em>$1</em>")
+        .replace(/`([^`]+)`/g, "<code style='background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:4px;font-family:var(--font-mono);font-size:12px;'>$1</code>")
+        .replace(/\n/g, "<br>");
       
       msg.innerHTML = formattedText;
     }
@@ -71,13 +66,11 @@ export function mount(container) {
     const text = input.value.trim();
     if (!text) return;
 
-    // Add user message to chat
     addMessage(text, true);
     input.value = '';
     sendBtn.disabled = true;
     sendBtn.textContent = '...';
 
-    // Add loading message
     const loadingMsg = document.createElement('div');
     loadingMsg.style.alignSelf = 'flex-start';
     loadingMsg.style.color = 'var(--fg-muted)';
@@ -94,8 +87,6 @@ export function mount(container) {
       });
 
       const data = await res.json();
-      
-      // Remove loading message
       history.removeChild(loadingMsg);
 
       if (data.reply) {
@@ -103,10 +94,9 @@ export function mount(container) {
       } else {
         addMessage("Error: " + (data.error || "Unknown error"), false);
       }
-
     } catch (err) {
       history.removeChild(loadingMsg);
-      addMessage("Failed to connect to AI server. Check your Cloudflare URL.", false);
+      addMessage("Failed to connect to AI server.", false);
     }
 
     sendBtn.disabled = false;
