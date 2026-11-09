@@ -6,9 +6,7 @@ export const pluginInfo = {
   category: "utility"
 };
 
-export function mount(container) {
-  // 🚨 PASTE YOUR CLOUDFLARE WORKER URL HERE (Keep the quotes!)
-  // Example: const BACKEND_URL = "https://mindustry-ai.bobosawn.workers.dev";
+export function mount(container);
   const BACKEND_URL = "https://mindustry-ai.bobosawnthet.workers.dev/";
 
   container.innerHTML = `
@@ -65,10 +63,40 @@ export function mount(container) {
     if (!text) return;
 
     // Add user message to chat
-    addMessage(text, true);
-    input.value = '';
-    sendBtn.disabled = true;
-    sendBtn.textContent = '...';
+    function addMessage(text, isUser) {
+  const msg = document.createElement('div');
+  msg.style.maxWidth = '85%';
+  msg.style.padding = '10px 14px';
+  msg.style.borderRadius = 'var(--radius-md)';
+  msg.style.fontSize = '14px';
+  msg.style.lineHeight = '1.5';
+  
+  if (isUser) {
+    msg.style.alignSelf = 'flex-end';
+    msg.style.background = 'var(--accent-blue)';
+    msg.style.color = '#fff';
+    msg.style.borderBottomRightRadius = '2px';
+    msg.textContent = text; // User text stays plain
+  } else {
+    msg.style.alignSelf = 'flex-start';
+    msg.style.background = 'var(--bg-overlay)';
+    msg.style.color = 'var(--fg-default)';
+    msg.style.borderBottomLeftRadius = '2px';
+    
+    // 🪄 THE FIX: Convert Markdown to HTML
+    let formattedText = text
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") // Security first
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // Bold
+      .replace(/\*(.*?)\*/g, "<em>$1</em>") // Italics
+      .replace(/`([^`]+)`/g, "<code style='background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:4px;font-family:var(--font-mono);'>$1</code>") // Inline code
+      .replace(/\n/g, "<br>"); // Line breaks
+    
+    msg.innerHTML = formattedText;
+  }
+
+  history.appendChild(msg);
+  history.scrollTop = history.scrollHeight;
+    }
 
     // Add loading message
     const loadingMsg = document.createElement('div');
