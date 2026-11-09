@@ -7,7 +7,7 @@ export const pluginInfo = {
 };
 
 export function mount(container) {
-  // 🚨 REPLACE THIS STRING WITH YOUR CLOUDFLARE WORKER URL!
+  // 🚨 MAKE SURE YOUR CLOUDFLARE URL IS HERE
   const BACKEND_URL = "https://mindustry-ai.bobosawnthet.workers.dev/";
 
   container.innerHTML = `
@@ -48,14 +48,32 @@ export function mount(container) {
       msg.style.color = 'var(--fg-default)';
       msg.style.borderBottomLeftRadius = '2px';
       
-      let formattedText = text
-        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      // 🪄 ADVANCED MARKDOWN PARSER
+      // 1. Escape HTML for security
+      let tempText = text
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+      // 2. Extract code blocks (```code```) and hide them
+      let codeBlocks = [];
+      tempText = tempText.replace(/```[a-zA-Z]*\n?([\s\S]*?)```/g, (match, code) => {
+        codeBlocks.push(code.trim());
+        return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+      });
+
+      // 3. Format bold, italics, inline code, and line breaks
+      tempText = tempText
         .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
         .replace(/\*(.*?)\*/g, "<em>$1</em>")
         .replace(/`([^`]+)`/g, "<code style='background:rgba(0,0,0,0.3);padding:2px 4px;border-radius:4px;font-family:var(--font-mono);font-size:12px;'>$1</code>")
         .replace(/\n/g, "<br>");
+
+      // 4. Put the beautifully styled code blocks back in
+      codeBlocks.forEach((code, index) => {
+        const blockHtml = `<pre style="background: #000; border: 1px solid var(--border-muted); padding: 10px; border-radius: 6px; overflow-x: auto; font-family: var(--font-mono); font-size: 12px; margin: 8px 0; white-space: pre-wrap; word-break: break-all; text-align: left;">${code}</pre>`;
+        tempText = tempText.replace(`__CODE_BLOCK_${index}__`, blockHtml);
+      });
       
-      msg.innerHTML = formattedText;
+      msg.innerHTML = tempText;
     }
 
     history.appendChild(msg);
